@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="NoteVault — A secure, modern notes application powered by Firebase. Sign in to manage your personal notes." />
+    <title>NoteVault — Secure Notes App</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="auth-page">
+
+    <!-- ========================================
+       ANIMATED BACKGROUND — floating gradient orbs
+       ======================================== -->
+    <div class="bg-orbs" aria-hidden="true">
+        <span class="orb orb-1"></span>
+        <span class="orb orb-2"></span>
+        <span class="orb orb-3"></span>
+        <span class="orb orb-4"></span>
+    </div>
+
+    <!-- ========================================
+       AUTH CARD — glassmorphism container
+       ======================================== -->
+    <main class="auth-container" id="authContainer">
+        <!-- Brand -->
+        <div class="brand">
+            <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="4" width="40" height="40" rx="10" fill="url(#brandGrad)" />
+                <path d="M14 16h20M14 24h14M14 32h18" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+                <defs>
+                    <linearGradient id="brandGrad" x1="4" y1="4" x2="44" y2="44">
+                        <stop stop-color="#6c5ce7" />
+                        <stop offset="1" stop-color="#a29bfe" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h1 class="brand-name">NoteVault</h1>
+            <p class="brand-tagline">Your thoughts, securely stored.</p>
+        </div>
+
+        <!-- Error / Status Message -->
+        <div class="auth-message" id="authMessage" role="alert"></div>
+
+        <!-- Sign In Form -->
+        <form class="auth-form" id="signInForm">
+            <div class="input-group">
+                <label for="signInEmail">Email</label>
+                <input type="email" id="signInEmail" placeholder="you@example.com" required autocomplete="email" />
+            </div>
+            <div class="input-group">
+                <label for="signInPassword">Password</label>
+                <input type="password" id="signInPassword" placeholder="••••••••" required
+                    autocomplete="current-password" minlength="6" />
+            </div>
+            <button type="submit" class="btn btn-primary" id="signInBtn">
+                <span class="btn-text">Sign In</span>
+                <span class="btn-loader" aria-hidden="true"></span>
+            </button>
+        </form>
+
+        <!-- Sign Up Form (hidden by default) -->
+        <form class="auth-form hidden" id="signUpForm">
+            <div class="input-group">
+                <label for="signUpName">Display Name</label>
+                <input type="text" id="signUpName" placeholder="John Doe" required autocomplete="name" />
+            </div>
+            <div class="input-group">
+                <label for="signUpEmail">Email</label>
+                <input type="email" id="signUpEmail" placeholder="you@example.com" required autocomplete="email" />
+            </div>
+            <div class="input-group">
+                <label for="signUpPassword">Password</label>
+                <input type="password" id="signUpPassword" placeholder="Min 6 characters" required
+                    autocomplete="new-password" minlength="6" />
+            </div>
+            <button type="submit" class="btn btn-primary" id="signUpBtn">
+                <span class="btn-text">Create Account</span>
+                <span class="btn-loader" aria-hidden="true"></span>
+            </button>
+        </form>
+
+        <!-- Toggle between Sign In / Sign Up -->
+        <p class="auth-toggle" id="toggleText">
+            Don't have an account? <a href="#" id="toggleLink">Sign Up</a>
+        </p>
+    </main>
+
+    <!-- ========================================
+       SCRIPTS — ES6 module imports
+       ======================================== -->
+    <script type="module" src="auth.js"></script>
+</body>
+
+</html>

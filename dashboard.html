@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="description" content="NoteVault Dashboard — Notion-like notes with sharing." />
+    <title>NoteVault — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="dashboard-page">
+    <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><svg class="sidebar-logo" viewBox="0 0 48 48" fill="none">
+                <rect x="4" y="4" width="40" height="40" rx="10" fill="url(#sGrad)" />
+                <path d="M14 16h20M14 24h14M14 32h18" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+                <defs>
+                    <linearGradient id="sGrad" x1="4" y1="4" x2="44" y2="44">
+                        <stop stop-color="#6c5ce7" />
+                        <stop offset="1" stop-color="#a29bfe" />
+                    </linearGradient>
+                </defs>
+            </svg><span>NoteVault</span></div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <h4 class="sidebar-heading">Notes</h4>
+                <button class="sidebar-item active" data-filter="all"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16v16H4z" />
+                        <path d="M4 9h16M9 4v16" />
+                    </svg><span>All Notes</span><span class="sidebar-count" id="countAll">0</span></button>
+                <button class="sidebar-item" data-filter="pinned"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m15 4.5-4 4L7 10l-1.5 1.5 7 7L14 17l1.5-4 4-4" />
+                        <path d="m2 22 5.5-5.5" />
+                        <path d="m14 4.5 5.5 5.5" />
+                    </svg><span>Pinned</span><span class="sidebar-count" id="countPinned">0</span></button>
+                <button class="sidebar-item" data-filter="locked"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg><span>Private</span><span class="sidebar-count" id="countLocked">0</span></button>
+                <button class="sidebar-item" data-filter="shared"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                    </svg><span>Shared</span><span class="sidebar-count" id="countShared">0</span></button>
+            </div>
+            <div class="sidebar-section">
+                <h4 class="sidebar-heading">Labels</h4>
+                <div id="sidebarLabels"></div>
+            </div>
+            <hr class="sidebar-divider" />
+            <div class="sidebar-section">
+                <button class="sidebar-item" data-filter="archived"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="5" rx="1" />
+                        <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
+                        <path d="M10 12h4" />
+                    </svg><span>Archive</span><span class="sidebar-count" id="countArchived">0</span></button>
+                <button class="sidebar-item" data-filter="trashed"><svg width="18" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                    </svg><span>Trash</span><span class="sidebar-count" id="countTrashed">0</span></button>
+            </div>
+        </nav>
+    </aside>
+    <!-- MAIN -->
+    <div class="main-wrapper">
+        <header class="dash-header" id="dashHeader">
+            <div class="header-left">
+                <button class="icon-btn" id="sidebarToggle" aria-label="Toggle sidebar"><svg width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg></button>
+                <div class="search-box"><svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg><input type="text" id="searchInput" placeholder="Search notes…" autocomplete="off"
+                        name="notevault-search" role="searchbox" /></div>
+            </div>
+            <div class="header-right">
+                <select class="header-select" id="sortSelect">
+                    <option value="newest">Newest</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="title-az">A→Z</option>
+                    <option value="title-za">Z→A</option>
+                </select>
+                <button class="icon-btn" id="viewToggle" aria-label="Toggle view"><svg class="grid-icon" width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                    </svg><svg class="list-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6" />
+                        <line x1="8" y1="12" x2="21" y2="12" />
+                        <line x1="8" y1="18" x2="21" y2="18" />
+                    </svg></button>
+                <button class="icon-btn" id="darkModeToggle" aria-label="Dark mode"><svg class="sun-icon" width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="4" />
+                        <path
+                            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                    </svg><svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                    </svg></button>
+                <div class="user-menu" id="userMenu">
+                    <button class="user-avatar" id="userAvatar"><span id="userInitial">U</span></button>
+                    <div class="user-dropdown hidden" id="userDropdown">
+                        <p class="user-name" id="userName">User</p>
+                        <p class="user-email" id="userEmail">–</p>
+                        <hr />
+                        <button class="dropdown-btn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>Sign Out</button>
+                        <button class="dropdown-btn danger" id="deleteAccountBtn"><svg width="16" height="16"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                <line x1="10" y1="11" x2="10" y2="17" />
+                                <line x1="14" y1="11" x2="14" y2="17" />
+                            </svg>Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <main class="dash-main">
+            <div class="content-header">
+                <h1 id="viewTitle">All Notes</h1><span class="note-count-badge" id="noteCountBadge">0 notes</span>
+            </div>
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Loading…</p>
+            </div>
+            <div class="empty-state hidden" id="emptyState"><svg width="80" height="80" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1" class="empty-icon">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                    <polyline points="14 2 14 8 20 8" />
+                </svg>
+                <h2 id="emptyTitle">No notes yet</h2>
+                <p id="emptyMsg">Click + to create your first note!</p>
+            </div>
+            <div class="notes-grid" id="notesGrid"></div>
+        </main>
+    </div>
+    <!-- FAB -->
+    <div class="fab-wrapper"><button class="fab" id="fabAdd" title="New note"><svg width="28" height="28"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg></button></div>
+
+    <!-- NOTE EDITOR MODAL -->
+    <div class="modal-overlay hidden" id="noteModal">
+        <div class="modal-card modal-lg" role="dialog">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h2 id="modalTitle">New Note</h2>
+                </div>
+                <div class="modal-header-actions">
+                    <div class="color-picker-wrap"><button class="icon-btn sm" id="colorPickerBtn" title="Color"><svg
+                                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10" />
+                                <circle cx="12" cy="12" r="3" fill="currentColor" />
+                            </svg></button>
+                        <div class="color-picker-dropdown hidden" id="colorPicker"><button class="color-dot"
+                                data-color="default" title="Default"
+                                style="background:var(--clr-surface);border:2px solid var(--clr-border)"></button><button
+                                class="color-dot" data-color="coral" style="background:#ff8a80"></button><button
+                                class="color-dot" data-color="peach" style="background:#ffcc80"></button><button
+                                class="color-dot" data-color="sand" style="background:#fff59d"></button><button
+                                class="color-dot" data-color="mint" style="background:#a5d6a7"></button><button
+                                class="color-dot" data-color="sky" style="background:#80deea"></button><button
+                                class="color-dot" data-color="lavender" style="background:#b39ddb"></button><button
+                                class="color-dot" data-color="rose" style="background:#f48fb1"></button></div>
+                    </div>
+                    <button class="icon-btn sm" id="pinToggleBtn" title="Pin"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m15 4.5-4 4L7 10l-1.5 1.5 7 7L14 17l1.5-4 4-4" />
+                            <path d="m2 22 5.5-5.5" />
+                            <path d="m14 4.5 5.5 5.5" />
+                        </svg></button>
+                    <div class="label-picker-wrap"><button class="icon-btn sm" id="labelPickerBtn" title="Labels"><svg
+                                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z" />
+                                <path d="M7 7h.01" />
+                            </svg></button>
+                        <div class="label-picker-dropdown hidden" id="labelPicker">
+                            <div class="label-options" id="labelOptions"></div>
+                            <div class="label-add-row"><input type="text" id="newLabelInput" placeholder="New label…"
+                                    maxlength="20" /><button class="btn btn-sm btn-primary"
+                                    id="addLabelBtn">Add</button></div>
+                        </div>
+                    </div>
+                    <button class="icon-btn sm" id="lockToggleBtn" title="Password protect"><svg width="16" height="16"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="11" width="18" height="11" rx="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg></button>
+                    <button class="icon-btn sm modal-close" id="modalClose" aria-label="Close"><svg width="20"
+                            height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="noteTitle" class="note-title-input" placeholder="Untitled note…"
+                    maxlength="150" />
+                <input type="hidden" id="noteId" /><input type="hidden" id="noteType" value="text" />
+                <!-- BLOCK EDITOR -->
+                <div class="block-editor" id="blockEditor">
+                    <div class="block-toolbar" id="blockToolbar">
+                        <button type="button" class="tb-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+                        <button type="button" class="tb-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+                        <button type="button" class="tb-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+                        <button type="button" class="tb-btn" data-cmd="strikeThrough" title="Strike"><s>S</s></button>
+                        <span class="tb-sep"></span>
+                        <button type="button" class="tb-btn" id="linkBtn" title="Link">🔗</button>
+                    </div>
+                    <div class="blocks-container" id="blocksContainer"></div>
+                    <button type="button" class="add-block-btn" id="addBlockBtn">+ Add block</button>
+                </div>
+                <!-- SLASH MENU -->
+                <div class="slash-menu hidden" id="slashMenu">
+                    <input type="text" class="slash-filter" id="slashFilter" placeholder="Filter…" />
+                    <div class="slash-options" id="slashOptions"></div>
+                </div>
+                <div class="selected-labels" id="selectedLabels"></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+                <button class="btn btn-primary" id="saveNoteBtn"><span class="btn-text">Save Note</span><span
+                        class="btn-loader"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSWORD SET MODAL -->
+    <div class="modal-overlay hidden" id="passwordModal">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h2 id="pwModalTitle">Set Password</h2><button class="icon-btn sm modal-close" id="pwModalClose"><svg
+                        width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc" id="pwModalDesc">Set a password to protect this note.</p>
+                <div class="input-group"><label for="notePwInput">Password</label><input type="password"
+                        id="notePwInput" placeholder="Enter password…" autocomplete="new-password" /></div>
+                <div class="input-group" id="pwConfirmGroup"><label for="notePwConfirm">Confirm</label><input
+                        type="password" id="notePwConfirm" placeholder="Confirm password…"
+                        autocomplete="new-password" /></div>
+                <div class="modal-actions"><button class="btn btn-ghost" id="pwCancelBtn">Cancel</button><button
+                        class="btn btn-primary" id="pwSaveBtn">Set Password</button><button class="btn btn-ghost"
+                        id="pwRemoveBtn" style="display:none;color:var(--clr-danger)">Remove Password</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PASSWORD UNLOCK MODAL -->
+    <div class="modal-overlay hidden" id="unlockModal">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h2>🔒 Unlock Note</h2><button class="icon-btn sm modal-close" id="unlockModalClose"><svg width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Enter the password to view this note.</p>
+                <div class="input-group"><input type="password" id="unlockPwInput" placeholder="Password…"
+                        autocomplete="new-password" /></div>
+                <p class="pw-error hidden" id="unlockError">Incorrect password</p>
+                <input type="hidden" id="unlockNoteId" />
+                <div class="modal-actions"><button class="btn btn-ghost" id="unlockCancelBtn">Cancel</button><button
+                        class="btn btn-primary" id="unlockSubmitBtn">Unlock</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHARE MODAL -->
+    <div class="modal-overlay hidden" id="shareModal">
+        <div class="modal-card modal-md">
+            <div class="modal-header">
+                <h2>Share Note</h2><button class="icon-btn sm modal-close" id="shareModalClose"><svg width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="shareNoteId" />
+                <div class="share-toggle-row"><label class="switch-label">Share publicly</label><label
+                        class="toggle-switch"><input type="checkbox" id="shareToggle" /><span
+                            class="toggle-slider"></span></label></div>
+                <div class="share-pw-row"><label class="switch-label">Require password</label><label
+                        class="toggle-switch"><input type="checkbox" id="sharePwToggle" /><span
+                            class="toggle-slider"></span></label></div>
+                <div class="input-group hidden" id="sharePwGroup">
+                    <div class="share-link-row"><input type="password" id="sharePwInput" placeholder="Share password…"
+                            autocomplete="new-password" /><button class="btn btn-sm btn-primary" id="setSharePwBtn">Set
+                            Password</button></div>
+                </div>
+                <div class="share-link-box hidden" id="shareLinkBox">
+                    <label>Share Link</label>
+                    <div class="share-link-row"><input type="text" id="shareLinkInput" readonly /><button
+                            class="btn btn-sm btn-primary" id="copyLinkBtn">Copy</button></div>
+                </div>
+                <div class="share-options hidden" id="shareOptions">
+                    <h4>Share via</h4>
+                    <div class="share-btns">
+                        <button class="share-btn email" id="shareEmail" title="Email">📧 Email</button>
+                        <button class="share-btn whatsapp" id="shareWhatsapp" title="WhatsApp">💬 WhatsApp</button>
+                        <button class="share-btn twitter" id="shareTwitter" title="Twitter">🐦 Twitter</button>
+                        <button class="share-btn linkedin" id="shareLinkedin" title="LinkedIn">💼 LinkedIn</button>
+                        <button class="share-btn telegram" id="shareTelegram" title="Telegram">✈️ Telegram</button>
+                        <button class="share-btn embed" id="shareEmbed" title="Embed">📋 Embed Code</button>
+                    </div>
+                </div>
+                <div class="modal-actions"><button class="btn btn-ghost" id="shareCloseBtn">Done</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE NOTE MODAL -->
+    <div class="modal-overlay hidden" id="deleteModal">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h2 id="deleteTitle">Delete Note</h2><button class="icon-btn sm modal-close" id="deleteModalClose"><svg
+                        width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-msg" id="deleteMsg">Move to trash?</p><input type="hidden" id="deleteNoteId" />
+                <div class="modal-actions"><button class="btn btn-ghost" id="deleteCancelBtn">Cancel</button><button
+                        class="btn btn-danger" id="confirmDeleteBtn"><span class="btn-text">Delete</span><span
+                            class="btn-loader"></span></button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE ACCOUNT MODAL -->
+    <div class="modal-overlay hidden" id="deleteAccountModal">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h2>⚠️ Delete Account</h2><button class="icon-btn sm modal-close" id="delAccClose"><svg width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body">
+                <p class="delete-msg">This will permanently delete your account and all notes. This cannot be undone.
+                </p>
+                <div class="input-group"><label>Enter your password to confirm</label><input type="password"
+                        id="delAccPassword" placeholder="Password…" autocomplete="new-password" /></div>
+                <p class="pw-error hidden" id="delAccError">Incorrect password</p>
+                <div class="modal-actions"><button class="btn btn-ghost" id="delAccCancel">Cancel</button><button
+                        class="btn btn-danger" id="delAccConfirm"><span class="btn-text">Delete My Account</span><span
+                            class="btn-loader"></span></button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW MODAL -->
+    <div class="modal-overlay hidden" id="previewModal">
+        <div class="modal-card modal-lg">
+            <div class="modal-header">
+                <div class="modal-title-row">
+                    <h2 id="previewTitle">Note</h2>
+                </div><button class="icon-btn sm modal-close" id="previewClose"><svg width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-meta" id="previewMeta"></div>
+                <div class="preview-labels" id="previewLabels"></div>
+                <div class="preview-content" id="previewContent"></div>
+            </div>
+            <div class="modal-actions"><button class="btn btn-ghost" id="previewEditBtn">Edit</button><button
+                    class="btn btn-ghost" id="previewShareBtn">Share</button><button class="btn btn-ghost"
+                    id="previewDuplicateBtn">Duplicate</button><button class="btn btn-ghost"
+                    id="previewExportBtn">Export</button></div>
+        </div>
+    </div>
+
+    <!-- SHORTCUTS MODAL -->
+    <div class="modal-overlay hidden" id="shortcutsModal">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <h2>Shortcuts</h2><button class="icon-btn sm modal-close" id="shortcutsClose"><svg width="20"
+                        height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></button>
+            </div>
+            <div class="modal-body shortcuts-list">
+                <div class="shortcut-row"><kbd>N</kbd><span>New note</span></div>
+                <div class="shortcut-row"><kbd>/</kbd><span>Search or block menu</span></div>
+                <div class="shortcut-row"><kbd>D</kbd><span>Dark mode</span></div>
+                <div class="shortcut-row"><kbd>G</kbd><span>Grid/list</span></div>
+                <div class="shortcut-row"><kbd>Esc</kbd><span>Close modal</span></div>
+                <div class="shortcut-row"><kbd>?</kbd><span>Shortcuts</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script type="module" src="notes.js"></script>
+</body>
+
+</html>
