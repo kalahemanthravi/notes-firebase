@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Shared Note — NoteVault</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --pri: #6c5ce7;
+            --pri-l: #a29bfe;
+            --bg: #f0f0f5;
+            --sf: #fff;
+            --bdr: #e0e0ea;
+            --txt: #1e1e2f;
+            --txt2: #6b6b80;
+            --r: 14px;
+            --font: 'Inter', sans-serif;
+            --mono: 'JetBrains Mono', monospace
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--txt);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center
+        }
+
+        .top-bar {
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            border-bottom: 1px solid var(--bdr);
+            background: var(--sf)
+        }
+
+        .top-bar svg {
+            width: 28px;
+            height: 28px
+        }
+
+        .top-bar span {
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--pri), var(--pri-l));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent
+        }
+
+        .container {
+            max-width: 780px;
+            width: 100%;
+            padding: 2rem 1.5rem 4rem;
+            margin: 0 auto
+        }
+
+        .pw-gate {
+            max-width: 400px;
+            margin: 4rem auto;
+            text-align: center;
+            padding: 2rem;
+            background: var(--sf);
+            border-radius: var(--r);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .08)
+        }
+
+        .pw-gate h2 {
+            margin-bottom: .3rem
+        }
+
+        .pw-gate p {
+            color: var(--txt2);
+            font-size: .9rem;
+            margin-bottom: 1.2rem
+        }
+
+        .pw-gate input {
+            width: 100%;
+            padding: .65rem .85rem;
+            border: 1.5px solid var(--bdr);
+            border-radius: 8px;
+            font-size: .95rem;
+            outline: none;
+            margin-bottom: .8rem
+        }
+
+        .pw-gate input:focus {
+            border-color: var(--pri)
+        }
+
+        .pw-gate button {
+            padding: .65rem 1.5rem;
+            background: linear-gradient(135deg, var(--pri), var(--pri-l));
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .pw-gate .err {
+            color: #ff6b6b;
+            font-size: .85rem;
+            margin-top: .5rem;
+            display: none
+        }
+
+        .note-header {
+            margin-bottom: 1.5rem
+        }
+
+        .note-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: .4rem
+        }
+
+        .note-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .8rem;
+            font-size: .82rem;
+            color: var(--txt2)
+        }
+
+        .note-labels {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .3rem;
+            margin-top: .6rem
+        }
+
+        .label-chip {
+            font-size: .7rem;
+            font-weight: 600;
+            padding: .15rem .5rem;
+            border-radius: 50px;
+            color: #fff
+        }
+
+        .block {
+            margin: .3rem 0;
+            line-height: 1.65
+        }
+
+        .block p {
+            margin: .2rem 0
+        }
+
+        .block-h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: .8rem 0 .3rem
+        }
+
+        .block-h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: .6rem 0 .2rem
+        }
+
+        .block-h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: .5rem 0 .2rem
+        }
+
+        .block-bullet {
+            padding-left: 1.5rem;
+            position: relative
+        }
+
+        .block-bullet::before {
+            content: '•';
+            position: absolute;
+            left: .4rem;
+            color: var(--pri);
+            font-weight: 700
+        }
+
+        .block-number {
+            padding-left: 1.5rem
+        }
+
+        .block-todo {
+            display: flex;
+            align-items: flex-start;
+            gap: .5rem
+        }
+
+        .block-todo input {
+            accent-color: var(--pri);
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            pointer-events: none
+        }
+
+        .block-todo.checked span {
+            text-decoration: line-through;
+            opacity: .5
+        }
+
+        .block-quote {
+            border-left: 4px solid var(--pri-l);
+            padding: .5rem 1rem;
+            margin: .5rem 0;
+            color: var(--txt2);
+            font-style: italic;
+            background: rgba(108, 92, 231, .04);
+            border-radius: 0 8px 8px 0
+        }
+
+        .block-callout {
+            display: flex;
+            gap: .6rem;
+            padding: .8rem 1rem;
+            background: rgba(108, 92, 231, .06);
+            border-radius: 8px;
+            margin: .5rem 0
+        }
+
+        .block-callout .callout-emoji {
+            font-size: 1.2rem;
+            line-height: 1.5
+        }
+
+        .block-code {
+            position: relative;
+            background: #1a1a2e;
+            color: #e8e8ff;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: .85rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: .5rem 0
+        }
+
+        .block-code .lang {
+            position: absolute;
+            top: .4rem;
+            right: .4rem;
+            font-size: .65rem;
+            background: rgba(255, 255, 255, .15);
+            padding: .1rem .4rem;
+            border-radius: 4px
+        }
+
+        .block-code .copy-btn {
+            position: absolute;
+            top: .4rem;
+            right: auto;
+            left: .4rem;
+            font-size: .7rem;
+            background: rgba(255, 255, 255, .15);
+            padding: .2rem .5rem;
+            border-radius: 4px;
+            border: none;
+            color: #fff;
+            cursor: pointer
+        }
+
+        .block-code .copy-btn:hover {
+            background: rgba(255, 255, 255, .3)
+        }
+
+        .block-copyable {
+            position: relative;
+            background: var(--bg);
+            border: 1px solid var(--bdr);
+            border-radius: 8px;
+            padding: 1rem 1rem 1rem 3rem;
+            font-family: var(--mono);
+            font-size: .88rem;
+            white-space: pre-wrap;
+            margin: .5rem 0
+        }
+
+        .block-copyable .copy-btn {
+            position: absolute;
+            top: .4rem;
+            right: .4rem;
+            font-size: .7rem;
+            background: var(--pri);
+            color: #fff;
+            padding: .2rem .5rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer
+        }
+
+        .block-divider {
+            border: none;
+            border-top: 2px solid var(--bdr);
+            margin: 1rem 0
+        }
+
+        .block-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: .5rem 0;
+            font-size: .88rem
+        }
+
+        .block-table td,
+        .block-table th {
+            border: 1px solid var(--bdr);
+            padding: .45rem .6rem;
+            text-align: left
+        }
+
+        .block-table th {
+            background: rgba(108, 92, 231, .06);
+            font-weight: 600
+        }
+
+        .block-bookmark {
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+            padding: .8rem 1rem;
+            border: 1px solid var(--bdr);
+            border-radius: 8px;
+            background: var(--sf);
+            margin: .5rem 0
+        }
+
+        .block-bookmark a {
+            color: var(--pri);
+            font-weight: 500;
+            word-break: break-all
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--txt2)
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--bdr);
+            border-top-color: var(--pri);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 1rem
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .not-found {
+            text-align: center;
+            padding: 4rem
+        }
+
+        .not-found h2 {
+            margin-bottom: .4rem
+        }
+
+        .not-found p {
+            color: var(--txt2)
+        }
+
+        .branding {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--bdr);
+            font-size: .8rem;
+            color: var(--txt2)
+        }
+
+        .branding a {
+            color: var(--pri);
+            font-weight: 600
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar">
+        <svg viewBox="0 0 48 48" fill="none">
+            <rect x="4" y="4" width="40" height="40" rx="10" fill="url(#sg)" />
+            <path d="M14 16h20M14 24h14M14 32h18" stroke="#fff" stroke-width="2.5" stroke-linecap="round" />
+            <defs>
+                <linearGradient id="sg" x1="4" y1="4" x2="44" y2="44">
+                    <stop stop-color="#6c5ce7" />
+                    <stop offset="1" stop-color="#a29bfe" />
+                </linearGradient>
+            </defs>
+        </svg>
+        <span>NoteVault</span>
+    </div>
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading shared note…</p>
+        </div>
+        <div id="pwGate" class="pw-gate" style="display:none">
+            <h2>🔒 Password Protected</h2>
+            <p>This note requires a password to view.</p>
+            <input type="password" id="pwInput" placeholder="Enter password…" />
+            <button id="pwSubmit">Unlock</button>
+            <p class="err" id="pwErr">Incorrect password. Try again.</p>
+        </div>
+        <div id="noteView" style="display:none"></div>
+        <div id="notFound" class="not-found" style="display:none">
+            <h2>Note not found</h2>
+            <p>This shared note doesn't exist or has been removed.</p>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        const app = initializeApp({ apiKey: "AIzaSyAUGcoRgtcxK49EDEpyYB7MPVHEbSU1_5I", authDomain: "notes-94c9c.firebaseapp.com", projectId: "notes-94c9c", storageBucket: "notes-94c9c.firebasestorage.app", messagingSenderId: "994611817691", appId: "1:994611817691:web:1b730ed16f8ea350ec30fe" });
+        const db = getFirestore(app);
+        const params = new URLSearchParams(location.search);
+        const shareId = params.get("id");
+        const loading = document.getElementById("loading"), pwGate = document.getElementById("pwGate"),
+            noteView = document.getElementById("noteView"), notFound = document.getElementById("notFound"),
+            pwInput = document.getElementById("pwInput"), pwSubmit = document.getElementById("pwSubmit"), pwErr = document.getElementById("pwErr");
+        let noteData = null;
+        async function hashPw(p) { const e = new TextEncoder().encode(p); const h = await crypto.subtle.digest("SHA-256", e); return Array.from(new Uint8Array(h)).map(b => b.toString(16).padStart(2, "0")).join("") }
+        function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML }
+        function renderBlocks(blocks) {
+            return blocks.map(b => {
+                switch (b.type) {
+                    case "h1": return `<div class="block block-h1">${b.html || esc(b.content || "")}</div>`;
+                    case "h2": return `<div class="block block-h2">${b.html || esc(b.content || "")}</div>`;
+                    case "h3": return `<div class="block block-h3">${b.html || esc(b.content || "")}</div>`;
+                    case "bullet": return `<div class="block block-bullet">${b.html || esc(b.content || "")}</div>`;
+                    case "number": return `<div class="block block-number">${b.html || esc(b.content || "")}</div>`;
+                    case "todo": return `<div class="block block-todo${b.checked ? " checked" : ""}"><input type="checkbox"${b.checked ? " checked" : ""}><span>${b.html || esc(b.content || "")}</span></div>`;
+                    case "code": return `<div class="block block-code">${b.lang ? `<span class="lang">${esc(b.lang)}</span>` : ""}<button class="copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('code').textContent)">Copy</button><code>${esc(b.content || "")}</code></div>`;
+                    case "quote": return `<div class="block block-quote">${b.html || esc(b.content || "")}</div>`;
+                    case "callout": return `<div class="block block-callout"><span class="callout-emoji">${b.emoji || "💡"}</span><span>${b.html || esc(b.content || "")}</span></div>`;
+                    case "divider": return `<hr class="block-divider"/>`;
+                    case "table": if (!b.rows) return ""; return `<table class="block-table">${b.rows.map((r, i) => `<tr>${r.map(c => `<${i === 0 ? "th" : "td"}>${esc(c)}</${i === 0 ? "th" : "td"}>`).join("")}</tr>`).join("")}</table>`;
+                    case "copyable": return `<div class="block block-copyable"><button class="copy-btn" onclick="navigator.clipboard.writeText(this.nextElementSibling.textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)">Copy</button><span>${esc(b.content || "")}</span></div>`;
+                    case "bookmark": return `<div class="block block-bookmark"><a href="${esc(b.url || "#")}" target="_blank" rel="noopener">${esc(b.url || "")}</a>${b.content ? `<span>${esc(b.content)}</span>` : ""}</div>`;
+                    default: return `<div class="block">${b.html || esc(b.content || "")}</div>`;
+                }
+            }).join("");
+        }
+        function renderNote(data) {
+            let labelsHtml = "";
+            if (data.labels && data.labels.length) { labelsHtml = `<div class="note-labels">${data.labels.map(l => `<span class="label-chip" style="background:#6c5ce7">${esc(l)}</span>`).join("")}</div>` }
+            let contentHtml = "";
+            try {
+                const blocks = JSON.parse(data.content);
+                if (Array.isArray(blocks) && blocks.length && blocks[0].type) { contentHtml = renderBlocks(blocks) }
+                else { contentHtml = `<div class="block">${data.content}</div>` }
+            } catch { contentHtml = `<div class="block">${data.content || ""}</div>` }
+            const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "";
+            noteView.innerHTML = `<div class="note-header"><h1 class="note-title">${esc(data.title || "Untitled")}</h1><div class="note-meta"><span>Shared by ${esc(data.ownerName || "someone")}</span>${date ? `<span>${date}</span>` : ""}</div>${labelsHtml}</div><div class="note-content">${contentHtml}</div><div class="branding">Shared via <a href="index.html">NoteVault</a></div>`;
+            noteView.style.display = "block";
+        }
+        async function init() {
+            if (!shareId) { loading.style.display = "none"; notFound.style.display = "block"; return }
+            try {
+                const snap = await getDoc(doc(db, "sharedNotes", shareId));
+                if (!snap.exists()) { loading.style.display = "none"; notFound.style.display = "block"; return }
+                noteData = snap.data();
+                loading.style.display = "none";
+                if (noteData.passwordHash) {
+                    pwGate.style.display = "block";
+                    pwSubmit.onclick = async () => {
+                        const h = await hashPw(pwInput.value);
+                        if (h === noteData.passwordHash) { pwGate.style.display = "none"; renderNote(noteData) }
+                        else { pwErr.style.display = "block"; pwInput.value = "" }
+                    };
+                    pwInput.addEventListener("keydown", e => { if (e.key === "Enter") pwSubmit.click() });
+                } else { renderNote(noteData) }
+            } catch (e) { console.error(e); loading.style.display = "none"; notFound.style.display = "block" }
+        }
+        init();
+    </script>
+</body>
+
+</html>
