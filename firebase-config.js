@@ -14,7 +14,7 @@
 
 // ---------- Firebase SDK imports (CDN — ES module) ----------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
 // ---------- Firebase project configuration ----------
@@ -37,3 +37,5 @@ export const auth = getAuth(app);
 
 /** Cloud Firestore instance */
 export const db = getFirestore(app);
+
+export const googleProvider = new GoogleAuthProvider();

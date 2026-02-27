@@ -1,9 +1,9 @@
 /**
  * NoteVault v3 — Block Editor, Sharing, Passwords, Delete Account
  */
-import { auth, db } from "./firebase-config.js";
+import { auth, db, googleProvider } from "./firebase-config.js";
 import {
-    onAuthStateChanged, signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider
+    onAuthStateChanged, signOut, deleteUser, reauthenticateWithCredential, EmailAuthProvider, reauthenticateWithPopup
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 import {
     collection, addDoc, doc, updateDoc, deleteDoc, getDocs, getDoc, setDoc,
@@ -89,6 +89,14 @@ searchInput.value = "";
 // Auth
 onAuthStateChanged(auth, u => {
     if (!u) { window.location.href = "index.html"; return }
+
+    // Redirect if user logged in via email/password but is not verified
+    const isGoogle = u.providerData.some(p => p.providerId === "google.com");
+    if (!isGoogle && !u.emailVerified) {
+        window.location.href = "index.html";
+        return;
+    }
+
     currentUser = u; const name = u.displayName || "User";
     userName.textContent = name; userEmail.textContent = u.email; userInitial.textContent = name[0].toUpperCase();
     searchInput.value = ""; // clear autofill again after auth
@@ -550,16 +558,33 @@ previewDuplicateBtn.addEventListener("click", async () => { if (!previewingNote)
 previewExportBtn.addEventListener("click", () => { if (!previewingNote) return; const blocks = parseBlocks(previewingNote.content); let txt = `# ${previewingNote.title}\n\n`; blocks.forEach(b => { if (b.type === "divider") txt += "---\n"; else if (b.type === "todo") txt += `${b.checked ? "[x]" : "[ ]"} ${(b.content || b.html || "").replace(/<[^>]*>/g, "")}\n`; else if (b.type === "table" && b.rows) b.rows.forEach(r => txt += r.join(" | ") + "\n"); else txt += (b.content || b.html || "").replace(/<[^>]*>/g, "") + "\n" }); const blob = new Blob([txt], { type: "text/plain" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${(previewingNote.title || "note").replace(/[^a-z0-9]/gi, "_")}.txt`; a.click(); showToast("Exported!", "success") });
 
 // ── DELETE ACCOUNT ──
-deleteAccountBtn.addEventListener("click", () => { delAccPassword.value = ""; delAccError.classList.add("hidden"); deleteAccountModal.classList.remove("hidden") });
+deleteAccountBtn.addEventListener("click", () => {
+    delAccPassword.value = "";
+    delAccError.classList.add("hidden");
+    const isGoogle = currentUser.providerData.some(p => p.providerId === "google.com");
+    if (isGoogle) {
+        document.getElementById("delAccPasswordGroup").style.display = "none";
+    } else {
+        document.getElementById("delAccPasswordGroup").style.display = "block";
+    }
+    deleteAccountModal.classList.remove("hidden");
+});
 delAccClose.addEventListener("click", () => deleteAccountModal.classList.add("hidden"));
 delAccCancel.addEventListener("click", () => deleteAccountModal.classList.add("hidden"));
 deleteAccountModal.addEventListener("click", e => { if (e.target === deleteAccountModal) deleteAccountModal.classList.add("hidden") });
 delAccConfirm.addEventListener("click", async () => {
-    const pw = delAccPassword.value; if (!pw) { showToast("Enter password", "error"); return }
+    const isGoogle = currentUser.providerData.some(p => p.providerId === "google.com");
+    const pw = delAccPassword.value;
+    if (!isGoogle && !pw) { showToast("Enter password", "error"); return }
+
     setLoading(delAccConfirm, true); delAccError.classList.add("hidden");
     try {
-        const cred = EmailAuthProvider.credential(currentUser.email, pw);
-        await reauthenticateWithCredential(currentUser, cred);
+        if (isGoogle) {
+            await reauthenticateWithPopup(currentUser, googleProvider);
+        } else {
+            const cred = EmailAuthProvider.credential(currentUser.email, pw);
+            await reauthenticateWithCredential(currentUser, cred);
+        }
         // Delete all notes
         const snap = await getDocs(collection(db, "users", currentUser.uid, "notes"));
         for (const d of snap.docs) { if (d.data().shareId) try { await deleteDoc(doc(db, "sharedNotes", d.data().shareId)) } catch (e) { } await deleteDoc(d.ref) }
@@ -567,7 +592,7 @@ delAccConfirm.addEventListener("click", async () => {
         await deleteUser(currentUser);
         showToast("Account deleted", "info");
         setTimeout(() => window.location.href = "index.html", 1500);
-    } catch (err) { console.error(err); if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") delAccError.classList.remove("hidden"); else showToast("Failed to delete account", "error") }
+    } catch (err) { console.error(err); if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential" || err.code === "auth/popup-closed-by-user") delAccError.classList.remove("hidden"); else showToast("Failed to delete account", "error") }
     finally { setLoading(delAccConfirm, false) }
 });
 

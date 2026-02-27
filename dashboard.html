@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <meta name="description" content="NoteVault Dashboard — Notion-like notes with sharing." />
     <title>NoteVault — Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -126,6 +127,16 @@
                         <p class="user-name" id="userName">User</p>
                         <p class="user-email" id="userEmail">–</p>
                         <hr />
+                        <div
+                            style="font-size: 0.7rem; color: var(--clr-text-hint); text-align: center; margin-bottom: 0.6rem; padding: 0 0.5rem; line-height: 1.4;">
+                            <a href="terms.html" target="_blank"
+                                style="color: var(--clr-primary); text-decoration: none; font-weight: 600;">Terms</a>
+                            &bull;
+                            <a href="privacy.html" target="_blank"
+                                style="color: var(--clr-primary); text-decoration: none; font-weight: 600;">Privacy</a><br>
+                            <span style="display: block; margin-top: 0.3rem;">By using our website, you are agreeing to
+                                our terms and conditions.</span>
+                        </div>
                         <button class="dropdown-btn" id="logoutBtn"><svg width="16" height="16" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -380,8 +391,8 @@
             <div class="modal-body">
                 <p class="delete-msg">This will permanently delete your account and all notes. This cannot be undone.
                 </p>
-                <div class="input-group"><label>Enter your password to confirm</label><input type="password"
-                        id="delAccPassword" placeholder="Password…" autocomplete="new-password" /></div>
+                <div class="input-group" id="delAccPasswordGroup"><label>Enter your password to confirm</label><input
+                        type="password" id="delAccPassword" placeholder="Password…" autocomplete="new-password" /></div>
                 <p class="pw-error hidden" id="delAccError">Incorrect password</p>
                 <div class="modal-actions"><button class="btn btn-ghost" id="delAccCancel">Cancel</button><button
                         class="btn btn-danger" id="delAccConfirm"><span class="btn-text">Delete My Account</span><span

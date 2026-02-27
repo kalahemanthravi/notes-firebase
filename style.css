@@ -2156,3 +2156,80 @@ body:not(.dark) .sun-icon {
         grid-template-columns: repeat(2, 1fr)
     }
 }
+
+/* Terms & Conditions Checkbox Box */
+.terms-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.2rem;
+    background: rgba(108, 92, 231, 0.05);
+    border: 1px solid rgba(108, 92, 231, 0.15);
+    border-radius: var(--radius-sm);
+    transition: all var(--dur) var(--ease);
+}
+
+.terms-box:hover {
+    background: rgba(108, 92, 231, 0.08);
+    border-color: rgba(108, 92, 231, 0.3);
+}
+
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid var(--clr-border);
+    border-radius: 4px;
+    background-color: var(--clr-surface);
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    transition: all var(--dur) var(--ease);
+}
+
+.custom-checkbox:checked {
+    background-color: var(--clr-primary);
+    border-color: var(--clr-primary);
+}
+
+.custom-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 4px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.custom-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+    border-color: var(--clr-primary);
+}
+
+.terms-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--clr-text-secondary);
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.terms-label a {
+    color: var(--clr-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--dur) var(--ease);
+}
+
+.terms-label a:hover {
+    color: var(--clr-primary-light);
+    text-decoration: underline;
+}
