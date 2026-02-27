@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /dashboard.html
+
+Sitemap: https://notes-94c9c.web.app/sitemap.xml
